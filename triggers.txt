@@ -1,0 +1,22 @@
+DELIMITER $
+
+CREATE TRIGGER Tgr_Clientes_Insert AFTER INSERT
+ON clientes
+FOR EACH ROW
+BEGIN
+	INSERT INTO TABELA_CHAVE(ID, TABELA, CARGA) VALUES(OLD.ID, "CLIENTES", 0);
+END$
+
+DELIMITER $
+
+CREATE TRIGGER Tgr_Clientes_Update AFTER UPDATE
+ON clientes
+FOR EACH ROW
+BEGIN
+
+update tableA set value = tableB.value from tableB where tableA.name =tableB.name
+UPDATE TABELA_CHAVE A SET CARGA = 1 FROM CLIENTES B WHERE A.TABELA = 'CLIENTES' AND A.ID = B.ID;
+
+END$
+
+
