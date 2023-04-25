@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 18/04/2023 às 21:52
--- Versão do servidor: 10.4.28-MariaDB
--- Versão do PHP: 8.0.28
+-- Tempo de geração: 26-Abr-2023 às 01:31
+-- Versão do servidor: 10.4.27-MariaDB
+-- versão do PHP: 8.1.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `clientes`
+-- Estrutura da tabela `clientes`
 --
 
 CREATE TABLE `clientes` (
@@ -34,25 +34,25 @@ CREATE TABLE `clientes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Despejando dados para a tabela `clientes`
+-- Extraindo dados da tabela `clientes`
 --
 
 INSERT INTO `clientes` (`id`, `nome`, `endereco`) VALUES
-(1, 'Joao Pedro', 'Rua peru');
+(10, 'Joao Alves', 'Rua treze');
 
 --
 -- Acionadores `clientes`
 --
 DELIMITER $$
 CREATE TRIGGER `Tgr_Clientes_Insert` AFTER INSERT ON `clientes` FOR EACH ROW BEGIN
-	INSERT INTO TABELA_CHAVE(ID, TABELA, CARGA) VALUES(ID, "CLIENTES", 0);
+	INSERT INTO TABELA_CHAVE(ID, TABELA, CARGA) VALUES(new.ID, "CLIENTES", 0);
 END
 $$
 DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `Tgr_Clientes_Update` AFTER UPDATE ON `clientes` FOR EACH ROW BEGIN
 
-UPDATE TABELA_CHAVE SET CARGA = 1 WHERE TABELA_CHAVE.TABELA = 'CLIENTES' AND TABELA_CHAVE.ID = OLD.ID;
+UPDATE TABELA_CHAVE SET TABELA_CHAVE.CARGA = 0 WHERE TABELA_CHAVE.TABELA = 'CLIENTES' AND TABELA_CHAVE.ID = OLD.ID;
 
 END
 $$
@@ -61,7 +61,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `livros`
+-- Estrutura da tabela `livros`
 --
 
 CREATE TABLE `livros` (
@@ -73,7 +73,7 @@ CREATE TABLE `livros` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Despejando dados para a tabela `livros`
+-- Extraindo dados da tabela `livros`
 --
 
 INSERT INTO `livros` (`id`, `titulo`, `valor_compra`, `valor_venda`, `data_alteracao`) VALUES
@@ -1077,12 +1077,31 @@ INSERT INTO `livros` (`id`, `titulo`, `valor_compra`, `valor_venda`, `data_alter
 (2406, 'C&C 17', 88, 111, NULL),
 (2407, 'THE MASTERPIECE', 52, 71, NULL),
 (2408, 'MAGE-PROVOCATEUR', 116, 151, NULL),
-(2409, 'BEDLAM LOST', 69, 91, NULL);
+(2409, 'BEDLAM LOST', 69, 91, NULL),
+(2410, 'JURAMENTADAs (SAGA EL ARCHIVO DE LAS TORMENTAS 3)', 55, 88, NULL);
+
+--
+-- Acionadores `livros`
+--
+DELIMITER $$
+CREATE TRIGGER `Tgr_Livros_Insert` AFTER INSERT ON `livros` FOR EACH ROW BEGIN
+	INSERT INTO TABELA_CHAVE(ID, TABELA, CARGA) VALUES(new.ID, "LIVROS", 0);
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `Tgr_Livros_Update` AFTER UPDATE ON `livros` FOR EACH ROW BEGIN
+
+UPDATE TABELA_CHAVE SET TABELA_CHAVE.CARGA = 0 WHERE TABELA_CHAVE.TABELA = 'LIVROS' AND TABELA_CHAVE.ID = OLD.ID;
+
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `lojas`
+-- Estrutura da tabela `lojas`
 --
 
 CREATE TABLE `lojas` (
@@ -1094,7 +1113,7 @@ CREATE TABLE `lojas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Despejando dados para a tabela `lojas`
+-- Extraindo dados da tabela `lojas`
 --
 
 INSERT INTO `lojas` (`id`, `faturamento_mensal`, `crescimento_mensal`, `crescimento_anual`, `endereco`) VALUES
@@ -1117,12 +1136,31 @@ INSERT INTO `lojas` (`id`, `faturamento_mensal`, `crescimento_mensal`, `crescime
 (17, NULL, NULL, NULL, 'RUA BARÃO DE COCAIS'),
 (18, NULL, NULL, NULL, 'RUA JOÃO CALVINO'),
 (19, NULL, NULL, NULL, 'RUA ARARAQUARA '),
-(20, NULL, NULL, NULL, 'RUA AUGUSTO JOSÉ DE ARAÚJO');
+(20, NULL, NULL, NULL, 'RUA AUGUSTO JOSÉ DE ARAÚJO'),
+(21, 2500, 15.5, 27.8, 'Rua peru');
+
+--
+-- Acionadores `lojas`
+--
+DELIMITER $$
+CREATE TRIGGER `Tgr_Lojas_Insert` AFTER INSERT ON `lojas` FOR EACH ROW BEGIN
+	INSERT INTO TABELA_CHAVE(ID, TABELA, CARGA) VALUES(new.ID, "LOJAS", 0);
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `Tgr_Lojas_Update` AFTER UPDATE ON `lojas` FOR EACH ROW BEGIN
+
+UPDATE TABELA_CHAVE SET TABELA_CHAVE.CARGA = 0 WHERE TABELA_CHAVE.TABELA = 'LOJAS' AND TABELA_CHAVE.ID = OLD.ID;
+
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `tabela_chave`
+-- Estrutura da tabela `tabela_chave`
 --
 
 CREATE TABLE `tabela_chave` (
@@ -1132,61 +1170,63 @@ CREATE TABLE `tabela_chave` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Despejando dados para a tabela `tabela_chave`
+-- Extraindo dados da tabela `tabela_chave`
 --
 
 INSERT INTO `tabela_chave` (`id`, `tabela`, `carga`) VALUES
-(0, 'CLIENTES', 0);
+(10, 'CLIENTES', 0),
+(21, 'LOJAS', 0),
+(2410, 'LIVROS', 0);
 
 --
 -- Índices para tabelas despejadas
 --
 
 --
--- Índices de tabela `clientes`
+-- Índices para tabela `clientes`
 --
 ALTER TABLE `clientes`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices de tabela `livros`
+-- Índices para tabela `livros`
 --
 ALTER TABLE `livros`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices de tabela `lojas`
+-- Índices para tabela `lojas`
 --
 ALTER TABLE `lojas`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices de tabela `tabela_chave`
+-- Índices para tabela `tabela_chave`
 --
 ALTER TABLE `tabela_chave`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT para tabelas despejadas
+-- AUTO_INCREMENT de tabelas despejadas
 --
 
 --
 -- AUTO_INCREMENT de tabela `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de tabela `livros`
 --
 ALTER TABLE `livros`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2410;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2411;
 
 --
 -- AUTO_INCREMENT de tabela `lojas`
 --
 ALTER TABLE `lojas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
