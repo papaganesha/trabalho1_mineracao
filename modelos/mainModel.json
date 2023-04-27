@@ -1,0 +1,20 @@
+[
+{
+    "codModelo" : "m01",
+    "codAssunto": "v01",
+    "tabela": "vendas",
+    "corte":"27/04/2023 08:26:49.219717"
+},
+{
+    "codModelo" : "m02",
+    "codAssunto": "v01",
+    "tabela": "lojas",
+    "corte":"27/04/2023 08:26:49.219717"
+},
+{
+    "codModelo" : "m03",
+    "codAssunto": "v01",
+    "tabela": "livros",
+    "corte":"27/04/2023 08:26:49.219717"
+}
+]

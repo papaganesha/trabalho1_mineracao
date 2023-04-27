@@ -22,7 +22,7 @@ cursor = cnx.cursor()
 
 
 clientsToInsert = []
-clientsToInput = 350
+clientsToInput = 300
 
 clients = pd.read_excel('./dados/clientes.xlsx', sheet_name="Plan1")
 
@@ -34,7 +34,7 @@ count = 0
 while (count < clientsToInput):
     # EXTRAI LINHA DO DATAFRAME
     lin = clientsDf.loc[count]
-    print(lin.NOME, lin.ENDERECO.upper())
+    #print(lin.NOME, lin.ENDERECO.upper())
     # INSERE OS DADOS DO CLIENTE EM UM ARRAY DE OBJETOS
     clientsToInsert.append({
         "NOME": lin.NOME,
@@ -43,8 +43,8 @@ while (count < clientsToInput):
     # INCREMENTA CONTADOR
     count += 1
 
-print(clientsToInsert)
-print(clientsToInsert[2])
+#print(clientsToInsert)
+#print(clientsToInsert[2])
 
 
 add_client = ("INSERT INTO CLIENTES (NOME, ENDERECO) VALUES (%s, %s)")
@@ -52,7 +52,7 @@ countAdded = 0
 # RODAR CLIENTES A SEREM INSERIDOS
 for client in clientsToInsert:
     # INSERIR NO BANCO AQUI
-    print(client['NOME'])
+    #print(client['NOME'])
     nome = client['NOME']
     endereco = client['ENDERECO']
     data_client = (nome, endereco)

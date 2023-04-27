@@ -1,8 +1,8 @@
-# INSERIR CLIENTES NO BANCO DE DADOS
+# INSERIR LOJAS NO BANCO DE DADOS
 # CARREGAR CSV
 # EXTRAIR DADOS DO CSV
 # CONECTAR COM BANCO
-# INSERIR CLIENTES
+# INSERIR LOJAS
 
 import pandas as pd
 import mysql.connector
@@ -39,22 +39,22 @@ while (count < storesToInput):
     # INCREMENTA CONTADOR
     count += 1
 
+    
 
 
-
-add_client = ("INSERT INTO LOJAS (ENDERECO) VALUES (%s)")
+add_client = ("INSERT INTO LOJAS (NOME, ENDERECO) VALUES (%s, %s)")
 countAdded = 0
 # RODAR CLIENTES A SEREM INSERIDOS
 for address in storesToInsert:
     # INSERIR NO BANCO AQUI
     try:
-        cursor.execute(add_client, (address,))
+        cursor.execute(add_client, (address, address,))
         countAdded +=1
     except Exception as e:
         print(e)
     
     
-print(f"{countAdded} novos clientes inseridos")
+print(f"{countAdded} novas lojas inseridos")
 
 cnx.commit()
 
