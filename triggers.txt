@@ -20,3 +20,26 @@ UPDATE TABELA_CHAVE A SET CARGA = 1 FROM CLIENTES B WHERE A.TABELA = 'CLIENTES' 
 END$
 
 
+
+
+#TRIGGER DW_D_CLIENTES
+#Tgr_unflag_clients
+
+BEGIN
+    UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_CLIENTE AND tabela_chave.tabela = 'CLIENTES';
+END
+
+
+#TRIGGER DW_D_LOJAS
+#Tgr_unflag_lojas
+
+BEGIN
+    UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LOJA AND tabela_chave.tabela = 'LOJAS';
+END
+
+
+#TRIGGER DW_D_LIVROS
+#Tgr_unflag_livros
+BEGIN
+    UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LIVRO AND tabela_chave.tabela = 'LIVROS';
+END

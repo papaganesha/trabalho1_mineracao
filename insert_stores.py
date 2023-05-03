@@ -16,48 +16,46 @@ config = {
     'raise_on_warnings': True
 }
 
-cnx = mysql.connector.connect(**config)
+def insert_stores(stores_nbr):
+    cnx = mysql.connector.connect(**config)
 
-cursor = cnx.cursor()
+    cursor = cnx.cursor()
 
+    storesToInsert = []
 
-storesToInsert = []
-storesToInput = 20
+    storesAdresses = pd.read_excel('./dados/clientes.xlsx', sheet_name="Plan1")
 
-storesAdresses = pd.read_excel('./dados/clientes.xlsx', sheet_name="Plan1")
+    storesDf = pd.DataFrame(storesAdresses)
 
-storesDf = pd.DataFrame(storesAdresses)
+    count = 0
 
-count = 0
-
-# ENQUANTO COUNT FOR MENOR QUE O NUMERO DE CLIENTES A SEREM INSERIDOS
-while (count < storesToInput):
-    # EXTRAI LINHA DO DATAFRAME
-    lin = storesDf.loc[count]
-    # INSERE OS DADOS DO CLIENTE EM UM ARRAY DE OBJETOS
-    storesToInsert.append(lin.ENDERECO.upper())
-    # INCREMENTA CONTADOR
-    count += 1
-
-    
+    # ENQUANTO COUNT FOR MENOR QUE O NUMERO DE CLIENTES A SEREM INSERIDOS
+    while (count < stores_nbr):
+        # EXTRAI LINHA DO DATAFRAME
+        lin = storesDf.loc[count]
+        # INSERE OS DADOS DO CLIENTE EM UM ARRAY DE OBJETOS
+        storesToInsert.append(lin.ENDERECO.upper())
+        # INCREMENTA CONTADOR
+        count += 1
 
 
-add_client = ("INSERT INTO LOJAS (NOME, ENDERECO) VALUES (%s, %s)")
-countAdded = 0
-# RODAR CLIENTES A SEREM INSERIDOS
-for address in storesToInsert:
-    # INSERIR NO BANCO AQUI
-    try:
-        cursor.execute(add_client, (address, address,))
-        countAdded +=1
-    except Exception as e:
-        print(e)
-    
-    
-print(f"{countAdded} novas lojas inseridos")
 
-cnx.commit()
+    add_store = ("INSERT INTO LOJAS (NOME, ENDERECO) VALUES (%s, %s)")
+    countAdded = 0
+    # RODAR CLIENTES A SEREM INSERIDOS
+    for address in storesToInsert:
+        # INSERIR NO BANCO AQUI
+        try:
+            cursor.execute(add_store, (address, address,))
+            countAdded +=1
+        except Exception as e:
+            print(e)
+        
+        
+    print(f"{countAdded} novas lojas inseridos")
 
-cursor.close()
+    cnx.commit()
 
-cnx.close()
+    cursor.close()
+
+    cnx.close()

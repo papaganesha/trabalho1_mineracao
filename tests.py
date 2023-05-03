@@ -1,116 +1,48 @@
-import mysql.connector
-import random as rd
+# IMPORT THE SQALCHEMY LIBRARY's CREATE_ENGINE METHOD
+from sqlalchemy import create_engine
+import pandas as pd
+
+# DEFINE THE DATABASE CREDENTIALS
+user = 'root'
+password = ''
+host = '127.0.0.1'
+port = 3306
+database = 'mineracao'
+
+# PYTHON FUNCTION TO CONNECT TO THE MYSQL DATABASE AND
+# RETURN THE SQLACHEMY ENGINE OBJECT
+def get_connection():
+    return create_engine(url=F"mysql+pymysql://{user}:{password}@{host}:{port}/{database}")
 
 
-config = {
-    'user': 'root',
-    'password': '',
-    'host': '127.0.0.1',
-    'database': 'mineracao',
-    'raise_on_warnings': True
-}
+if __name__ == '__main__':
+        try:
+            # GET THE CONNECTION OBJECT (ENGINE) FOR THE DATABASE
+            engine = get_connection()
+            print(f"Connection to the {host} for user {user} created successfully.")
 
-cnx = mysql.connector.connect(**config)
+        
+        except Exception as ex:
+            print("Connection could not be made due to the following error: \n", ex)
+	
+        clients_df = pd.read_sql_query("SELECT A.ID_CLIENTE, A.NOME, A.ENDERECO, SUM(C.VALOR) AS 'GASTOS', COUNT(D.ID_VENDA) AS 'LIVROS' FROM CLIENTES A, TABELA_CHAVE B, VENDAS C, ITENS_VENDAS D WHERE A.ID_CLIENTE = B.ID AND B.TABELA = 'CLIENTES' AND CARGA = 0 AND A.ID_CLIENTE = C.ID_CLIENTE AND C.ID_VENDA = D.ID_VENDA GROUP BY ID;",engine)
+        print(clients_df.head(5))
+        client_id = clients_df[clients_df['ID_CLIENTE']==1]
+        print(client_id)
 
-cursor = cnx.cursor()
+        clients_df.to_sql('dw_d_clientes',con=engine,if_exists='replace',index=False)
+        
+        #SOMANDO GASTOS DO CLIENTE
+        # waste=0
+        # if sal >500 and sal <=1250:
+        #     tax=sal*.125
+        # elif sal>1250 and sal<=1700:
+        #     tax=sal*.175
+        # elif sal>1700 and sal<=2500:
+        #     tax=sal*.225
+        # elif sal>2500:
+        #     tax=sal*.275
+        # else:
+        #     tax=0
+        # peint(waste)
 
-# simulando sorteio de equipamentos/sorte em com pesos e numero total de elementos
-# sorteio = rd.sample(["SIMPLES", "MÉDIO", "RARO"], counts=[6, 3, 1], k=10)
-# sorteio.sort()
-# print(sorteio)
-
-# Definindo numero de livros por venda
-# sorteio = rd.sample([1, 2, 3], counts=[12, 6, 2], k=20)
-# sorteio.sort()
-# print(sorteio)
-
-
-# PEGAR 100(OU MAIS) CLIENTES ALEATORIOS DO BANCO
-# SELECT * FROM CLIENTES ORDER BY RAND() LIMIT 100;
-
-sells_number = 100
-
-for i in range(sells_number):
-    print(f'============ INSERINDO NOVA VENDA =================================================================')
-    print(f'VENDA NUMERO => {i}')
-    # Definindo numero de livros por venda
-    sorteio = rd.sample([1, 2, 3], counts=[12, 6, 2], k=1)
-    # sorteio.sort()
-    print(f'NUMERO DE LIVROS DA VENDA => {sorteio[0]}')
-
-    books_on_sell = []
-    print("===== LIVROS DA VENDA ========================================")
-    for i in range(sorteio[0]):
-        # pega livro aleatorio
-        get_random_book = ("SELECT ID_LIVRO, TITULO, VALOR_VENDA FROM LIVROS ORDER BY RAND() LIMIT 1")
-        #data_sell = (title, buy_value, sell_value)
-
-        # EXECUTANDO QUERY
-        cursor.execute(get_random_book)
-        # PEGANDO RESULTADOS DA QUERY
-        result = cursor.fetchall()
-        # ID, TITULO E VALOR DE VENDA DO LIVRO ALEATORIO
-        print(f'ID_LIVRO => {result[0][0]} / TITULO => {result[0][1]} / VALOR => R${result[0][2]}')
-        # cnx.commit()
-        books_on_sell.append(result[0])
-
-
-
-    # somar valor da venda
-    # print(books_on_sell[0][2])
-    soma = 0
-    for i in books_on_sell:
-        # print(i[2])
-        soma += i[2]
-
-    print("SOMA_VENDA => ", soma)
-
-    # pega cliente aleatorio
-    get_random_client = (
-        "SELECT ID_CLIENTE FROM CLIENTES ORDER BY RAND() LIMIT 1")
-    #data_sell = (title, buy_value, sell_value)
-
-    # EXECUTANDO QUERY
-    cursor.execute(get_random_client)
-    # PEGANDO RESULTADOS DA QUERY
-    result = cursor.fetchall()
-    # ID DO CLIENTE ALEATORIO
-    print(f'ID_CLIENTE => {result[0][0]}')
-    id_cliente = result[0][0]
-    # cnx.commit()
-
-    # pega loja aleatoria
-    get_random_store = ("SELECT ID_LOJA FROM LOJAS ORDER BY RAND() LIMIT 1")
-    #data_sell = (title, buy_value, sell_value)
-
-    # EXECUTANDO QUERY
-    cursor.execute(get_random_store)
-    # PEGANDO RESULTADOS DA QUERY
-    result = cursor.fetchall()
-    # ID DA LOJA ALEATORIA
-    print(f'ID_LOJA => {result[0][0]}')
-    id_loja = result[0][0]
-    # Query da venda
-    add_sell = ('INSERT INTO VENDAS(ID_CLIENTE, ID_LOJA, VALOR) VALUES (%s, %s, %s)')
-
-    # EXECUTANDO QUERY DA VENDA
-    cursor.execute(add_sell, (id_cliente, id_loja, soma))
-    # #PEGANDO ID DA VENDA
-    sell_id = cursor.lastrowid
-
-    # Adicionar item venda para cada livro
-    for i in range(sorteio[0]):
-        #Query de item_venda
-        add_book_sell = ("INSERT INTO ITENS_VENDAS (ID_VENDA, ID_LIVRO) VALUES (%s, %s)")
-        #DADOS DE INSERCAO DA VENDA
-        print("test", books_on_sell[i][0])
-        #EXECUTANDO QUERY DA VENDA
-        cursor.execute(add_book_sell, (sell_id, books_on_sell[i][0]))
-        print
-    
-
-cursor.close()
-
-cnx.commit()
-
-cnx.close()

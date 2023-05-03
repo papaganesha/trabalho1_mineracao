@@ -16,53 +16,55 @@ config = {
     'raise_on_warnings': True
 }
 
-cnx = mysql.connector.connect(**config)
 
-cursor = cnx.cursor()
+def insert_clients(clients_nbr):
+    cnx = mysql.connector.connect(**config)
 
-
-clientsToInsert = []
-clientsToInput = 300
-
-clients = pd.read_excel('./dados/clientes.xlsx', sheet_name="Plan1")
-
-clientsDf = pd.DataFrame(clients)
-
-count = 0
-
-# ENQUANTO COUNT FOR MENOR QUE O NUMERO DE CLIENTES A SEREM INSERIDOS
-while (count < clientsToInput):
-    # EXTRAI LINHA DO DATAFRAME
-    lin = clientsDf.loc[count]
-    #print(lin.NOME, lin.ENDERECO.upper())
-    # INSERE OS DADOS DO CLIENTE EM UM ARRAY DE OBJETOS
-    clientsToInsert.append({
-        "NOME": lin.NOME,
-        "ENDERECO": lin.ENDERECO.upper()
-    })
-    # INCREMENTA CONTADOR
-    count += 1
-
-#print(clientsToInsert)
-#print(clientsToInsert[2])
+    cursor = cnx.cursor()
 
 
-add_client = ("INSERT INTO CLIENTES (NOME, ENDERECO) VALUES (%s, %s)")
-countAdded = 0
-# RODAR CLIENTES A SEREM INSERIDOS
-for client in clientsToInsert:
-    # INSERIR NO BANCO AQUI
-    #print(client['NOME'])
-    nome = client['NOME']
-    endereco = client['ENDERECO']
-    data_client = (nome, endereco)
-    cursor.execute(add_client, data_client)
-    countAdded +=1
-    
-print(f"{countAdded} novos clientes inseridos")
+    clientsToInsert = []
 
-cnx.commit()
+    clients = pd.read_excel('./dados/clientes.xlsx', sheet_name="Plan1")
 
-cursor.close()
+    clientsDf = pd.DataFrame(clients)
 
-cnx.close()
+    count = 0
+
+    # ENQUANTO COUNT FOR MENOR QUE O NUMERO DE CLIENTES A SEREM INSERIDOS
+    while (count < clients_nbr):
+        # EXTRAI LINHA DO DATAFRAME
+        lin = clientsDf.loc[count]
+        #print(lin.NOME, lin.ENDERECO.upper())
+        # INSERE OS DADOS DO CLIENTE EM UM ARRAY DE OBJETOS
+        clientsToInsert.append({
+            "NOME": lin.NOME,
+            "ENDERECO": lin.ENDERECO.upper()
+        })
+        # INCREMENTA CONTADOR
+        count += 1
+
+    #print(clientsToInsert)
+    #print(clientsToInsert[2])
+
+
+    add_client = ("INSERT INTO CLIENTES (NOME, ENDERECO) VALUES (%s, %s)")
+    countAdded = 0
+    # RODAR CLIENTES A SEREM INSERIDOS
+    for client in clientsToInsert:
+        # INSERIR NO BANCO AQUI
+        #print(client['NOME'])
+        nome = client['NOME']
+        endereco = client['ENDERECO']
+        data_client = (nome, endereco)
+        cursor.execute(add_client, data_client)
+        countAdded +=1
+        
+    print(f"{countAdded} novos clientes inseridos")
+
+    cnx.commit()
+
+    cursor.close()
+
+    cnx.close()
+
