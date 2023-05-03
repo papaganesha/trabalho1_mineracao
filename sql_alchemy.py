@@ -14,7 +14,6 @@ def get_engine():
         try:
             # GET THE CONNECTION OBJECT (ENGINE) FOR THE DATABASE
             engine = create_engine(url=F"mysql+pymysql://{user}:{password}@{host}:{port}/{database}")
-            print(f"Connection to the {host} for user {user} created successfully.")
             return engine
         
         except Exception as ex:

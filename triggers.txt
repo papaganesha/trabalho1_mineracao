@@ -1,23 +1,45 @@
-DELIMITER $
 
-CREATE TRIGGER Tgr_Clientes_Insert AFTER INSERT
-ON clientes
+
+CREATE TRIGGER Tgr_after_insert_clients
+AFTER INSERT ON clientes
 FOR EACH ROW
-BEGIN
-	INSERT INTO TABELA_CHAVE(ID, TABELA, CARGA) VALUES(OLD.ID, "CLIENTES", 0);
-END$
+INSERT INTO tabela_chave(data_op, id, id_modelo, tabela, carga) VALUES (now(), NEW.ID_CLIENTE, 1, 'CLIENTES', 0);
 
-DELIMITER $
 
-CREATE TRIGGER Tgr_Clientes_Update AFTER UPDATE
-ON clientes
+
+CREATE TRIGGER Tgr_after_update_clients
+AFTER UPDATE ON clientes
 FOR EACH ROW
-BEGIN
+INSERT INTO tabela_chave(data_op, id, id_modelo, tabela, carga) VALUES (now(), NEW.ID_CLIENTE, 1, 'CLIENTES', 0);
 
-update tableA set value = tableB.value from tableB where tableA.name =tableB.name
-UPDATE TABELA_CHAVE A SET CARGA = 1 FROM CLIENTES B WHERE A.TABELA = 'CLIENTES' AND A.ID = B.ID;
 
-END$
+
+CREATE TRIGGER Tgr_after_insert_stores
+AFTER INSERT ON lojas
+FOR EACH ROW
+INSERT INTO tabela_chave(data_op, id, id_modelo, tabela, carga) VALUES (now(), NEW.ID_LOJA, 2, 'LOJAS', 0)
+
+
+
+CREATE TRIGGER Tgr_after_update_stores
+AFTER UPDATE ON lojas
+FOR EACH ROW
+INSERT INTO tabela_chave(data_op, id, id_modelo, tabela, carga) VALUES (now(), NEW.ID_LOJA, 2, 'LOJAS', 0)
+
+
+CREATE TRIGGER Tgr_after_insert_books
+AFTER INSERT ON livros
+FOR EACH ROW
+INSERT INTO tabela_chave(data_op, id, id_modelo, tabela, carga) VALUES (now(), NEW.ID_LIVRO, 3, 'LIVROS', 0)
+
+
+
+CREATE TRIGGER Tgr_after_update_books
+AFTER UPDATE ON livros
+FOR EACH ROW
+INSERT INTO tabela_chave(data_op, id, id_modelo, tabela, carga) VALUES (now(), NEW.ID_LIVRO, 3, 'LIVROS', 0)
+
+
 
 
 
@@ -25,21 +47,81 @@ END$
 #TRIGGER DW_D_CLIENTES
 #Tgr_unflag_clients
 
-BEGIN
-    UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_CLIENTE AND tabela_chave.tabela = 'CLIENTES';
-END
+CREATE TRIGGER Tgr_unflag_clients
+AFTER INSERT ON dw_d_clientes
+FOR EACH ROW
+UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_CLIENTE AND tabela_chave.tabela = 'CLIENTES';
+
 
 
 #TRIGGER DW_D_LOJAS
 #Tgr_unflag_lojas
 
-BEGIN
-    UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LOJA AND tabela_chave.tabela = 'LOJAS';
-END
+CREATE TRIGGER Tgr_unflag_lojas
+AFTER INSERT ON dw_d_lojas
+FOR EACH ROW
+UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LOJA AND tabela_chave.tabela = 'LOJAS';
+
 
 
 #TRIGGER DW_D_LIVROS
 #Tgr_unflag_livros
+
+CREATE TRIGGER Tgr_unflag_livros
+AFTER INSERT ON dw_d_livros
+FOR EACH ROW
+UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LOJA AND tabela_chave.tabela = 'LOJAS';
+
+
+
+
+REATE TABLE tab_chave (
+	delta_id SERIAL primary key,
+	data_op DATE,          /* now() */
+	id_modelo bigint,
+	tabela VARCHAR(30),    /* a tabela do dado */
+	reg_id VARCHAR(30),    /* a PK do registro em questão */
+	data_etl DATE,         /* ultima data processada */
+	flag BOOL,             /* já foi processado ? */
+	CONSTRAINT fk_dimensao_modelo FOREIGN KEY (id_modelo) REFERENCES modelos (id_modelo)
+);
+
+CREATE OR REPLACE FUNCTION fn_author()
+RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LIVRO AND tabela_chave.tabela = 'LIVROS';
-END
+  INSERT INTO tab_chave (data_op, id_modelo, tabela, reg_id, flag)
+  VALUES (now(), 1, 'author', NEW.author_id, false);
+  RETURN NEW;
+END;
+
+CREATE TRIGGER exemplo_usando_funcao_na_trigger
+AFTER INSERT ON tb_usuarios
+    FOR EACH ROW EXECUTE PROCEDURE replica_dados_usuario();
+
+
+CREATE OR REPLACE FUNCTION fn_clientes()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO tab_chave (data_op, id_modelo, tabela, reg_id, flag)
+  VALUES (now(), 1, 'author', NEW.author_id, false);
+  RETURN NEW;
+END;
+
+CREATE TRIGGER exemplo_usando_funcao_na_trigger
+AFTER INSERT ON tb_usuarios
+    FOR EACH ROW EXECUTE PROCEDURE replica_dados_usuario();
+
+
+
+DELIMITER $$
+CREATE OR REPLACE FUNCTION fn_clientes ()
+RETURNS int
+BEGIN
+INSERT INTO tabela_chave(data_op, id, id_modelo, tabela, carga) VALUES (now(), 1, 'CLIENTES', NEW.ID_CLIENTE, 0);
+RETURN NEW.ID_CLIENTE;
+END $$
+DELIMITER ;
+
+CREATE TRIGGER Tgr_after_insert_or_update_clients 
+AFTER INSERT OR UPDATE ON CLIENTES
+    FOR EACH ROW EXECUTE PROCEDURE fn_clientes();

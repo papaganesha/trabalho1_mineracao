@@ -5,15 +5,7 @@ from load import load
 import pandas as pd
 
 
-
-
-def transform(data):
-    #transform data here
-    return data
-
-
-
-if __name__ == '__main__':
+def etl_books():
         engine = get_engine()
 	
         books_df = pd.read_sql_query("SELECT * FROM EXTRACT_BOOKS;",engine)

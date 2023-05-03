@@ -9,7 +9,7 @@ def transform(data):
     return data
 
 
-if __name__ == '__main__':
+def etl_stores():
         engine = get_engine()
 	
         stores_df = pd.read_sql_query("SELECT * FROM EXTRACT_STORES;",engine)

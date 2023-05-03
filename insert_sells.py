@@ -84,7 +84,7 @@ def insert_sells(sells_nbr, cut_date):
         add_sell = ('INSERT INTO `VENDAS`(ID_CLIENTE, ID_LOJA, VALOR, DATA_VENDA, DATA_CORTE) VALUES (%s, %s, %s, %s, %s);')
 
         # EXECUTANDO QUERY DA VENDA
-        print(id_cliente, id_loja, soma, cut_date, cut_date)
+        #print(id_cliente, id_loja, soma, cut_date, cut_date)
         cursor.execute(add_sell, (id_cliente, id_loja, soma, cut_date, cut_date))
         # #PEGANDO ID DA VENDA
         sell_id = cursor.lastrowid
@@ -100,7 +100,7 @@ def insert_sells(sells_nbr, cut_date):
             cursor.execute(add_book_sell, (sell_id, books_on_sell[i][0]))
         
 
-    print(f"{count} novas vendas inseridas")
+    print(f"{count} novas vendas inseridas para data_corte => {cut_date}")
 
     cursor.close()
 

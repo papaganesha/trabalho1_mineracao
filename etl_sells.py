@@ -3,11 +3,7 @@ from load import load
 
 import pandas as pd
 
-
-
-
-
-if __name__ == '__main__':
+def etl_sells():
         engine = get_engine()
 	
         stores_df = pd.read_sql_query("SELECT * FROM EXTRACT_STORES;",engine)

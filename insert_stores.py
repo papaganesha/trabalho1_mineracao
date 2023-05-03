@@ -59,3 +59,4 @@ def insert_stores(stores_nbr):
     cursor.close()
 
     cnx.close()
+
