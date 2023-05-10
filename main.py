@@ -11,29 +11,23 @@ from drop_table import drop_table
 from etl_clients import etl_clients
 from etl_stores import etl_stores
 from etl_books import etl_books
+from etl_sells import etl_sells
 
-from datetime import datetime, time    
+
+from numpy import random
 
 #DELETAR DADOS DAS TABELAS
-delete_table_data("CLIENTES")
-delete_table_data("LOJAS")
-delete_table_data("ITENS_VENDAS")
-delete_table_data("LIVROS")
-delete_table_data("VENDAS")
-delete_table_data("TABELA_CHAVE")
-delete_table_data("MODELOS")
-delete_table_data("DW_D_CLIENTES")
-delete_table_data("DW_D_LOJAS")
-delete_table_data("DW_D_LIVROS")
+to_delete  = ["CLIENTES" ,"LOJAS", "ITENS_VENDAS", "LIVROS","VENDAS", "TABELA_CHAVE", "MODELOS", "DW_D_CLIENTES", "DW_D_LOJAS", "DW_D_LIVROS", "DW_F_VENDAS"]
+for table_name in to_delete:
+    delete_table_data(table_name)
+
 
 
 #SETAR AUTOINCREMENT = 0
-set_autoincrement("CLIENTES")
-set_autoincrement("LOJAS")
-set_autoincrement("LIVROS")
-set_autoincrement("VENDAS")
-set_autoincrement("TABELA_CHAVE")
-set_autoincrement("MODELOS")
+to_set_autoincrement = ["CLIENTES", "LOJAS", "LIVROS", "VENDAS", "TABELA_CHAVE", "MODELOS"]
+for table_name in to_set_autoincrement:
+    set_autoincrement(table_name)
+
 
 
 
@@ -46,9 +40,9 @@ clients_to_insert = 350
 # #CHAMANDO FUNCAO PASSANDO PARAMETRO 
 insert_clients(clients_to_insert)
 
-# #INSERIR 800 LIVROS
+# #INSERIR 1200 LIVROS
 # #DEFININDO NUMERO DE LIVROS
-books_to_insert = 800
+books_to_insert = 1200
 # # #CHAMANDO FUNCAO PASSANDO PARAMETRO 
 insert_books(books_to_insert)
 
@@ -59,28 +53,18 @@ stores_to_insert = 20
 insert_stores(stores_to_insert)
 
 
-#INSERIR 450 VENDAS FICTIAS PARA DATA CORTE X
-#DEFININDO NUMERO DE VENDAS
-sells_to_insert = 450
-#DEFININDO DATA CORTE X
-#"2023-04-30 14:01:10" 
-cut_date = '2023-04-30 14:01:10'
-#CHAMANDO FUNCAO PASSANDO PARAMETRO 
-insert_sells(sells_to_insert, cut_date)
+#INSERIR ENTRE 800 E 1200 VENDAS FICTIAS PARA DATA VENDA X
+sell_dates = ['2023-04-20 14:01:10', '2023-04-29 16:08:40', '2023-04-30 14:08:40']
+total_inserted_sells = 0
+for sell_date in sell_dates:
+    sells_to_insert = random.randint(800, 1201)
+    total_inserted_sells += sells_to_insert
+    insert_sells(sells_to_insert, sell_date)
 
-
-#INSERIR 1000 VENDAS FICTIAS PARA DATA CORTE X
-#DEFININDO NUMERO DE VENDAS
-sells_to_insert = 1000
-#DEFININDO DATA CORTE X
-#"2023-04-30 16:08:40" 
-cut_date = '2023-05-30 16:08:40'
-#CHAMANDO FUNCAO PASSANDO PARAMETRO 
-insert_sells(sells_to_insert, cut_date)
-
-
+print(f"Total de vendas inseridas: {total_inserted_sells}")
 
 #RELIZAR EXTRACAO DO OLTP, TRANSFORMAR DADOS RESTANTES, CARREGAR DE VOLTA NO OLTP(SIMULANDO OLAP)
-# etl_clients()
-# etl_stores()
-# etl_books()
+etl_clients()
+etl_stores()
+etl_books()
+etl_sells()

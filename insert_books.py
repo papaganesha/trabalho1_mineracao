@@ -22,18 +22,20 @@ def insert_books(books_nbr):
 
     cursor = cnx.cursor()
 
-    booksToInsert = []
 
     books = pd.read_csv('./dados/books.csv', sep=",")
 
     booksDf = pd.DataFrame(books)
 
+    booksDf.dropna(inplace=True)
+
     count = 0
+    countAdded = 0
 
     # ENQUANTO COUNT FOR MENOR QUE O NUMERO DE LIVROS A SEREM INSERIDOS
     while (count < books_nbr):
         # EXTRAI LINHA DO DATAFRAME
-        lin = booksDf.loc[count]
+        lin = booksDf.iloc[count]
         #print(lin.title)
 
         buy_value = random.randint(19, 121)
@@ -41,35 +43,27 @@ def insert_books(books_nbr):
         to_add = random.randint(19, 40)
 
         sell_value = buy_value + to_add
-        # INSERE OS DADOS DO LIVRO EM UM ARRAY DE OBJETOS
-        booksToInsert.append({
-            "TITULO": lin.title,
-            "VALOR_COMPRA": buy_value,
-            "VALOR_VENDA": sell_value
-        })
-        # INCREMENTA CONTADOR
-        count += 1
 
 
+        add_book = ("INSERT INTO LIVROS (TITULO, CATEGORIA, VALOR_COMPRA, VALOR_VENDA) VALUES (%s, %s, %s, %s)")
 
-    add_book = ("INSERT INTO LIVROS (TITULO, VALOR_COMPRA, VALOR_VENDA) VALUES (%s, %s, %s)")
-    countAdded = 0
-    # RODAR LIVROS A SEREM INSERIDOS
-    for book in booksToInsert:
         # INSERIR NO BANCO AQUI
-        #print(book['TITULO'])
-        title = book['TITULO']
-        buy_value = book['VALOR_COMPRA']
-        sell_value = book['VALOR_VENDA']
-        data_book = (title, buy_value, sell_value)
+        title = lin.title
+        gender = lin.gender
+        buy_value = buy_value
+        sell_value = sell_value
+        data_book = (title, gender, buy_value, sell_value)
         #print(data_book)
         try:
             cursor.execute(add_book, data_book)
+
         except Exception as e:
             print(e)
-        
-        countAdded += 1
+            countAdded -= 1
+            
+        countAdded += 1        
 
+        count +=1
 
     print(f"{countAdded} novos livros inseridos")
 
@@ -78,4 +72,5 @@ def insert_books(books_nbr):
     cursor.close()
 
     cnx.close()
+
 

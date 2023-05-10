@@ -1,7 +1,5 @@
 from sql_alchemy import get_engine
 from load import load
-
-
 import pandas as pd
 
 

@@ -57,103 +57,7 @@ END
 $$
 DELIMITER ;
 
--- --------------------------------------------------------
 
---
--- Estrutura para tabela `dw_d_clientes`
---
-
-DROP TABLE IF EXISTS `dw_d_clientes`;
-CREATE TABLE IF NOT EXISTS `dw_d_clientes` (
-  `ID_CLIENTE` bigint DEFAULT NULL,
-  `NOME` text,
-  `ENDERECO` text
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
---
--- Acionadores `dw_d_clientes`
---
-DROP TRIGGER IF EXISTS `Tgr_unflag_clients`;
-DELIMITER $$
-CREATE TRIGGER `Tgr_unflag_clients` AFTER INSERT ON `dw_d_clientes` FOR EACH ROW BEGIN
-    UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_CLIENTE;
-END
-$$
-DELIMITER ;
-
--- --------------------------------------------------------
-
-
---
--- Acionadores `dw_d_livros`
---
-DROP TRIGGER IF EXISTS `Tgr_unflag_livros`;
-DELIMITER $$
-CREATE TRIGGER `Tgr_unflag_livros` AFTER INSERT ON `dw_d_livros` FOR EACH ROW BEGIN
-    UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LIVRO AND tabela_chave.tabela = 'LIVROS';
-END
-$$
-DELIMITER ;
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `dw_d_lojas`
---
-
-DROP TABLE IF EXISTS `dw_d_lojas`;
-CREATE TABLE IF NOT EXISTS `dw_d_lojas` (
-  `ID_LOJA` bigint DEFAULT NULL,
-  `ENDERECO` text
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Acionadores `dw_d_lojas`
---
-DROP TRIGGER IF EXISTS `Tgr_unflag_stores`;
-DELIMITER $$
-CREATE TRIGGER `Tgr_unflag_stores` AFTER INSERT ON `dw_d_lojas` FOR EACH ROW BEGIN
-    UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LOJA AND tabela_chave.tabela = 'LOJAS';
-END
-$$
-DELIMITER ;
-
--- --------------------------------------------------------
-
---
--- Estrutura stand-in para view `extract_books`
--- (Veja abaixo para a visão atual)
---
-DROP VIEW IF EXISTS `extract_books`;
-CREATE TABLE IF NOT EXISTS `extract_books` (
-`ID_LIVRO` int
-,`TITULO` varchar(120)
-);
-
--- --------------------------------------------------------
-
---
--- Estrutura stand-in para view `extract_clients`
--- (Veja abaixo para a visão atual)
---
-DROP VIEW IF EXISTS `extract_clients`;
-CREATE TABLE IF NOT EXISTS `extract_clients` (
-`ID_CLIENTE` int
-,`ENDERECO` varchar(100)
-);
-
--- --------------------------------------------------------
-
---
--- Estrutura stand-in para view `extract_stores`
--- (Veja abaixo para a visão atual)
---
-DROP VIEW IF EXISTS `extract_stores`;
-CREATE TABLE IF NOT EXISTS `extract_stores` (
-`ID_LOJA` int
-,`ENDERECO` varchar(100)
-);
 
 -- --------------------------------------------------------
 
@@ -179,6 +83,7 @@ DROP TABLE IF EXISTS `livros`;
 CREATE TABLE IF NOT EXISTS `livros` (
   `id_livro` int NOT NULL AUTO_INCREMENT,
   `titulo` varchar(120) COLLATE utf8mb4_general_ci NOT NULL,
+  `categoria` text not null,
   `valor_compra` float NOT NULL,
   `valor_venda` float NOT NULL,
   `data_alteracao` date DEFAULT NULL,
@@ -272,7 +177,7 @@ CREATE TABLE IF NOT EXISTS `vendas` (
   `id_loja` int NOT NULL,
   `valor` float NOT NULL,
   `data_venda` datetime NOT NULL,
-  `data_corte` datetime NOT NULL,
+  `data_corte` datetime NULL,
   PRIMARY KEY (`id_venda`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -323,7 +228,7 @@ COMMIT;
 --
 DROP TABLE IF EXISTS `dw_d_clientes`;
 CREATE TABLE IF NOT EXISTS `dw_d_clientes` (
-  `ID_CLIENTE` INT,
+  `ID_CLIENTE` bigint,
   `ENDERECO` VARCHAR(150),
   `GASTOS` float(20),
   `QUANTIDADE` INT
@@ -340,7 +245,7 @@ UPDATE `tabela_chave` SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_CLIENTE AND t
 
 DROP TABLE IF EXISTS `dw_d_lojas`;
 CREATE TABLE IF NOT EXISTS `dw_d_lojas` (
-  `ID_LOJA` INT,
+  `ID_LOJA` bigint,
   `ENDERECO` VARCHAR(150),
   `FATURAMENTO_BRUTO` FLOAT,
   `FATURAMENTO_LIQUIDO` FLOAT
@@ -358,7 +263,7 @@ UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LOJA AND tabela
 --
 DROP TABLE IF EXISTS `dw_d_livros`;
 CREATE TABLE IF NOT EXISTS `dw_d_livros` (
-  `ID_LIVRO` INT,
+  `ID_LIVRO` bigint,
   `VALOR_COMPRA` FLOAT,
   `VALOR_VENDA` FLOAT,
   `MARGEM` FLOAT
@@ -368,6 +273,28 @@ CREATE TRIGGER `Tgr_unflag_livros`
 AFTER INSERT ON dw_d_livros
 FOR EACH ROW
 UPDATE tabela_chave SET CARGA = 1 WHERE tabela_chave.id = NEW.ID_LIVRO AND tabela_chave.tabela = 'LIVROS';
+
+
+DROP TABLE IF EXISTS `dw_f_vendas`;
+CREATE TABLE IF NOT EXISTS `dw_f_vendas` (
+  `SURROGATE` BIGINT,
+  `ID_VENDA` bigint,
+  `ID_LOJA` bigint,
+  `VALOR` FLOAT,
+  `DATA_VENDA` datetime ,
+  `DATA_CORTE` datetime,
+  `ID_LIVRO` bigint
+);
+
+
+
+
+DROP TABLE IF EXISTS `etl_controle`;
+CREATE TABLE IF NOT EXISTS `etl_controle` (
+  `id_etl` BIGINT SERIAL PRIMARY KEY,
+  `data_inicio` datetime NOT NULL,
+  `data_ultimo_corte` datetime NULL
+);
 
 
 

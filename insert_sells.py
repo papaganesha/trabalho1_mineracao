@@ -10,7 +10,7 @@ config = {
     'raise_on_warnings': True
 }
 
-def insert_sells(sells_nbr, cut_date):
+def insert_sells(sells_nbr, sell_date):
     cnx = mysql.connector.connect(**config)
 
     cursor = cnx.cursor()
@@ -24,7 +24,8 @@ def insert_sells(sells_nbr, cut_date):
         # print(f'============ INSERINDO NOVA VENDA =================================================================')
         # print(f'VENDA NUMERO => {i}')
         # Definindo numero de livros por venda
-        sorteio = rd.sample([1, 2, 3], counts=[12, 6, 2], k=1)
+        sorteio = rd.sample([1, 2, 3, 4], counts=[12, 8, 6, 4], k=1)
+        #print("sorteio: ",sorteio)
         # sorteio.sort()
         # print(f'NUMERO DE LIVROS DA VENDA => {sorteio[0]}')
 
@@ -32,7 +33,7 @@ def insert_sells(sells_nbr, cut_date):
         # print("===== LIVROS DA VENDA ========================================")
         for i in range(sorteio[0]):
             # pega livro aleatorio
-            get_random_book = ("SELECT ID_LIVRO, TITULO, VALOR_VENDA FROM LIVROS ORDER BY RAND() LIMIT 1")
+            get_random_book = ("SELECT ID_LIVRO, VALOR_VENDA FROM LIVROS ORDER BY RAND() LIMIT 1")
             #data_sell = (title, buy_value, sell_value)
 
             # EXECUTANDO QUERY
@@ -51,7 +52,7 @@ def insert_sells(sells_nbr, cut_date):
         soma = 0
         for i in books_on_sell:
             # print(i[2])
-            soma += i[2]
+            soma += i[1]
 
         # print("SOMA_VENDA => ", soma)
 
@@ -81,11 +82,11 @@ def insert_sells(sells_nbr, cut_date):
         # print(f'ID_LOJA => {result[0][0]}')
         id_loja = result[0][0]
         # Query da venda
-        add_sell = ('INSERT INTO `VENDAS`(ID_CLIENTE, ID_LOJA, VALOR, DATA_VENDA, DATA_CORTE) VALUES (%s, %s, %s, %s, %s);')
+        add_sell = ('INSERT INTO `VENDAS`(ID_CLIENTE, ID_LOJA, VALOR, DATA_VENDA) VALUES (%s, %s, %s, %s);')
 
         # EXECUTANDO QUERY DA VENDA
         #print(id_cliente, id_loja, soma, cut_date, cut_date)
-        cursor.execute(add_sell, (id_cliente, id_loja, soma, cut_date, cut_date))
+        cursor.execute(add_sell, (id_cliente, id_loja, soma, sell_date))
         # #PEGANDO ID DA VENDA
         sell_id = cursor.lastrowid
         count+=1
@@ -100,7 +101,7 @@ def insert_sells(sells_nbr, cut_date):
             cursor.execute(add_book_sell, (sell_id, books_on_sell[i][0]))
         
 
-    print(f"{count} novas vendas inseridas para data_corte => {cut_date}")
+    print(f"{count} novas vendas inseridas para data_venda => {sell_date}")
 
     cursor.close()
 
