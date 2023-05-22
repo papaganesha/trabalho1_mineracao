@@ -13,3 +13,6 @@ def etl_stores():
 
         load(count_before_insertion, stores_df, engine, "dw_d_lojas")
 
+
+
+etl_stores()

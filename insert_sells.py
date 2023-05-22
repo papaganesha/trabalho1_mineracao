@@ -108,3 +108,6 @@ def insert_sells(sells_nbr, sell_date):
     cnx.commit()
 
     cnx.close()
+
+
+insert_sells(1000, '2023-05-22 10:32:00')

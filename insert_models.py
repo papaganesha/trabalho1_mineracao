@@ -21,13 +21,13 @@ def insert_models():
 
     cursor = cnx.cursor()
 
-    models_to_insert = ["clientes","lojas","livros"]
+    models_to_insert = ["VENDAS", "LOJAS", "LIVROS", "CLIENTES"]
 
     count_inserted = 0
     
     for model in models_to_insert:
         try:
-            add_model = "INSERT INTO MODELOS(ASSUNTO, SERVIDOR_ORIGEM, SERVIDOR_DESTINO) VALUES(%s, 'OLTP', 'STAGE');"
+            add_model = "INSERT INTO MODELOS(ASSUNTO, SERVIDOR_ORIGEM, SERVIDOR_DESTINO) VALUES(%s, 'OLTP', 'OLAP');"
             cursor.execute(add_model, (model, ))
             count_inserted +=1
         except Exception as e:

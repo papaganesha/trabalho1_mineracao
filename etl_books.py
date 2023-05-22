@@ -12,3 +12,5 @@ def etl_books():
 
         load(count_before_insertion, books_df, engine, "dw_d_livros")
 
+
+etl_books()

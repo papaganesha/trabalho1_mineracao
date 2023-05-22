@@ -1,3 +1,0 @@
-Encontrando o delta
-
-SELECT A.* from VENDAS A, ETL B WHERE A.data_corte > B.data_inicio
